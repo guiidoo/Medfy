@@ -1,144 +1,163 @@
 import 'dart:async';
-
+import 'package:flutter_application_1/chat_page.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_application_1/Models/alarme.dart';
+import 'package:flutter_application_1/Config/play_list.dart';
+import '../widgets/custom_card.dart';
+import '../widgets/custom_card_meditar.dart';
+import 'audio_rolando.dart';
+
+// Import das páginas de meditação
+import 'package:flutter_application_1/pages/sub_pages_meditar/introducao/pag_respiracao.dart';
+import 'package:flutter_application_1/pages/sub_pages_meditar/introducao/pag_relaxar.dart';
+import 'package:flutter_application_1/pages/sub_pages_meditar/introducao/pag_aprenda_meditacao.dart';
+import 'package:flutter_application_1/pages/sub_pages_meditar/meditacao_avancada/pag_mente_corpo.dart';
+
+// 1. CONSTANTES DE COR DECLARADAS GLOBALMENTE (OU EM UM TEMA)
+// Este é o local correto para as constantes para evitar erros de compilação
+const Color _cardColor = Color(0xFFC5E0D7); // Verde pastel claro e suave
+const Color _primaryTextColor = Color(
+  0xFF3B5249,
+); // Verde escuro para texto (Alto contraste)
+const Color _ctaColor = Color(
+  0xFF5A7F75,
+); // Um verde-médio para destaque da ação
+const Color _appNameColor = Color(0xFF4A4A4A); // Cor para o texto "Medfy"
 
 class HomePage extends StatefulWidget {
-  bool temaEscuro;
-  VoidCallback? onTrocarTema;
+  final bool temaEscuro;
+  final VoidCallback? onTrocarTema;
 
-  HomePage({this.temaEscuro = false, this.onTrocarTema});
+  // O construtor foi ajustado para usar chaves e a palavra-chave super.key
+  const HomePage({super.key, this.temaEscuro = false, this.onTrocarTema});
 
   @override
   State<HomePage> createState() => _HomePageState();
 }
 
 class _HomePageState extends State<HomePage> {
-  Timer? _timer;
-  Duration _tempoRestante = Duration.zero;
-  bool _timerAtivo = false;
+  final double cardHeight = 150;
 
-  int horasSelecionadas = 0;
-  int minutosSelecionados = 0;
-  int segundosSelecionados = 0;
+  final List<Map<String, dynamic>> meditarIntroCards = [
+    {
+      "text": "Respiração",
+      "page": const PagRespiracao(),
+      "image":
+          "https://cdn.pixabay.com/photo/2018/08/16/02/01/purple-3609478_1280.jpg",
+    },
+    {
+      "text": "Relaxamento",
+      "page": const PagRelaxar(),
+      "image":
+          "https://cdn.pixabay.com/photo/2017/12/17/21/44/drink-3025022_1280.jpg",
+    },
+    {
+      "text": "Comece a Meditar",
+      "page": const PagAprendaMeditacao(),
+      "image":
+          "https://cdn.pixabay.com/photo/2020/06/29/17/41/meditate-5353620_1280.jpg",
+    },
+  ];
 
-  final TextEditingController _nomeController = TextEditingController();
-
-  List<Alarme> alarmesSalvos = [];
-
-  void _iniciarTimer(Duration duracao) {
-    _timer?.cancel();
-    setState(() {
-      _tempoRestante = duracao;
-      _timerAtivo = true;
-    });
-
-    _timer = Timer.periodic(Duration(seconds: 1), (timer) {
-      if (_tempoRestante.inSeconds == 0) {
-        timer.cancel();
-        setState(() {
-          _timerAtivo = false;
-        });
-        _mostrarAlerta();
-      } else {
-        setState(() {
-          _tempoRestante = _tempoRestante - Duration(seconds: 1);
-        });
-      }
-    });
-  }
-
-  void _pararTimer() {
-    if (_timer != null && _timerAtivo) {
-      _timer!.cancel();
-      setState(() {
-        _timerAtivo = false;
-      });
-    }
-  }
-
-  void _apagarTimer() {
-    _pararTimer();
-    setState(() {
-      _tempoRestante = Duration.zero;
-    });
-  }
-
-  void _mostrarAlerta() {
-    showDialog(
-      context: context,
-      builder: (_) => AlertDialog(
-        title: Text('Alarme'),
-        content: Text('O tempo acabou!'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: Text('Ok'),
+  // 2. WIDGET QUE CONSTRÓI O CARD DE CHAT DA IA (Função auxiliar)
+  Widget _buildAiChatCard(double largura) {
+    return Padding(
+      // Padding externo que controla a margem do card na tela
+      padding: EdgeInsets.symmetric(horizontal: largura * 0.05, vertical: 10),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Texto "Medfy"
+          const Text(
+            "Medfy",
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              // Usamos a cor _appNameColor definida globalmente
+              color: _appNameColor,
+            ),
           ),
-        ],
-      ),
-    );
-  }
+          const SizedBox(height: 12),
 
-  String _formatarDuration(Duration duracao) {
-    String doisDigitos(int n) => n.toString().padLeft(2, '0');
-    final horas = doisDigitos(duracao.inHours);
-    final minutos = doisDigitos(duracao.inMinutes.remainder(60));
-    final segundos = doisDigitos(duracao.inSeconds.remainder(60));
-    return '$horas:$minutos:$segundos';
-  }
+          // CARD PRINCIPAL: Usando Card e InkWell para um design mais bonito
+          Card(
+            elevation: 4.0, // Sombra suave (cria efeito de flutuação)
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16), // Bordas arredondadas
+            ),
+            clipBehavior: Clip.antiAlias,
+            child: InkWell(
+              // Adiciona o efeito visual de toque (ripple/splash)
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    // Certifique-se de que ChatPage está importada
+                    builder: (context) => const ChatPage(),
+                  ),
+                );
+              },
+              // Container interno para cor e layout
+              child: Container(
+                width: double.infinity,
+                color: _cardColor, // Cor pastel do card
+                padding: const EdgeInsets.all(18), // Padding interno uniforme
 
-  void _salvarAlarme(String nome, Duration duracao) {
-    if (duracao.inSeconds > 0 && nome.trim().isNotEmpty) {
-      bool existe = alarmesSalvos.any(
-        (a) =>
-            a.nome.toLowerCase() == nome.toLowerCase() && a.duracao == duracao,
-      );
-      if (!existe) {
-        setState(() {
-          alarmesSalvos.add(Alarme(nome: nome.trim(), duracao: duracao));
-        });
-      }
-    }
-  }
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // 2. Linha do Ícone e Texto Principal
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Ícone (Bem-estar/Meditação) para enriquecer o visual
+                        Icon(Icons.spa_rounded, color: _ctaColor, size: 24),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: const Text(
+                            'Tire dúvidas sobre meditação e áudios.',
+                            style: TextStyle(
+                              color: _primaryTextColor,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                              height: 1.4,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
 
-  Widget _buildPicker({
-    required int value,
-    required int max,
-    required ValueChanged<int> onChanged,
-    required String label,
-  }) {
-    return Column(
-      children: [
-        SizedBox(
-          width: 80,
-          height: 120,
-          child: CupertinoPicker(
-            scrollController: FixedExtentScrollController(initialItem: value),
-            itemExtent: 32,
-            onSelectedItemChanged: onChanged,
-            children: List.generate(
-              max + 1,
-              (index) => Center(
-                child: Text(
-                  index.toString().padLeft(2, '0'),
-                  style: TextStyle(fontWeight: FontWeight.bold),
+                    const SizedBox(height: 24),
+
+                    // 3. CTA (Chamada para Ação) em Destaque
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        Text(
+                          "Toque para conversar",
+                          style: TextStyle(
+                            color: _ctaColor,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w700,
+                            letterSpacing: 0.5,
+                          ),
+                        ),
+                        const SizedBox(width: 4),
+                        Icon(
+                          Icons.arrow_forward_ios_rounded,
+                          size: 16,
+                          color: _ctaColor,
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
               ),
             ),
           ),
-        ),
-        SizedBox(height: 6),
-      ],
+        ],
+      ),
     );
-  }
-
-  @override
-  void dispose() {
-    _timer?.cancel();
-    _nomeController.dispose();
-    super.dispose();
   }
 
   @override
@@ -147,359 +166,209 @@ class _HomePageState extends State<HomePage> {
     double altura = MediaQuery.of(context).size.height;
 
     return Scaffold(
+      backgroundColor: const Color(0xFFEBE8E0),
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: EdgeInsets.all(largura * 0.05),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  GestureDetector(
-                    onTap: widget.onTrocarTema,
-                    child: CircleAvatar(
-                      radius: largura * 0.07,
-                      backgroundColor: Colors.transparent,
-                    ),
-                  ),
-                  SizedBox(width: largura * 0.03),
-                  Padding(
-                    padding: EdgeInsets.only(left: largura * 0.05),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          "Silencie o mundo.",
-                          style: TextStyle(
-                            color: widget.temaEscuro
-                                ? Colors.grey[300]
-                                : Colors.blueGrey[400],
-                            fontSize: largura * 0.045,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        Text(
-                          "Ouça a si mesmo.",
-                          style: TextStyle(
-                            color: widget.temaEscuro
-                                ? Colors.white
-                                : Colors.blue[800],
-                            fontSize: largura * 0.06,
-                            fontWeight: FontWeight.bold,
-                            shadows: [
-                              Shadow(
-                                offset: Offset(1.5, 1.5),
-                                blurRadius: 3,
-                                color: widget.temaEscuro
-                                    ? Colors.black54
-                                    : Colors.blue[200]!,
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-
-              SizedBox(height: altura * 0.05),
-
-              Center(
-                child: Container(
-                  width: largura * 0.7,
-                  height: altura * 0.14,
-                  decoration: BoxDecoration(
-                    color: widget.temaEscuro
-                        ? Colors.grey[850]
-                        : Colors.blue[100],
-                    borderRadius: BorderRadius.circular(24),
-                    boxShadow: [
-                      BoxShadow(
-                        color: widget.temaEscuro
-                            ? Colors.black54
-                            : Colors.blue.shade200,
-                        blurRadius: 10,
-                        offset: Offset(0, 4),
+              // Cabeçalho
+              Padding(
+                padding: EdgeInsets.all(largura * 0.05),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    GestureDetector(
+                      onTap: widget.onTrocarTema,
+                      child: CircleAvatar(
+                        radius: largura * 0.07,
+                        backgroundColor: Colors.transparent,
+                        backgroundImage: const AssetImage('assets/logo.png'),
                       ),
-                    ],
-                  ),
-                  child: Center(
-                    child: Text(
-                      "Navegar",
-                      style: TextStyle(
-                        fontSize: largura * 0.055,
-                        fontWeight: FontWeight.bold,
-                        color: widget.temaEscuro
-                            ? Colors.white
-                            : Colors.blue[800],
-                        shadows: [
-                          Shadow(
-                            offset: Offset(1.5, 1.5),
-                            blurRadius: 3,
-                            color: widget.temaEscuro
-                                ? Colors.black54
-                                : Colors.blue[200]!,
+                    ),
+                    SizedBox(width: largura * 0.03),
+                    Padding(
+                      padding: EdgeInsets.only(left: largura * 0.05),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            "Silencie o mundo.",
+                            style: TextStyle(
+                              color: const Color(0xFFA0C8C0),
+                              fontSize: largura * 0.045,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          Text(
+                            "Ouça a si mesmo.",
+                            style: TextStyle(
+                              color: const Color(0xFF748D88),
+                              fontSize: largura * 0.06,
+                              fontWeight: FontWeight.bold,
+                              shadows: [
+                                Shadow(
+                                  offset: const Offset(1.5, 1.5),
+                                  blurRadius: 3,
+                                  color: Colors.blue[200]!,
+                                ),
+                              ],
+                            ),
                           ),
                         ],
                       ),
-                    ),
-                  ),
-                ),
-              ),
-
-              SizedBox(height: altura * 0.04),
-
-              Text(
-                "Nome do Alarme:",
-                style: TextStyle(
-                  fontSize: largura * 0.045,
-                  fontWeight: FontWeight.w600,
-                  color: widget.temaEscuro ? Colors.white : Colors.black87,
-                ),
-              ),
-              SizedBox(height: 6),
-              TextField(
-                controller: _nomeController,
-                maxLength: 20,
-                style: TextStyle(
-                  color: widget.temaEscuro ? Colors.white : Colors.black,
-                ),
-                decoration: InputDecoration(
-                  counterText: '',
-                  filled: true,
-                  fillColor: widget.temaEscuro
-                      ? Colors.grey[850]
-                      : Colors.grey[200],
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide.none,
-                  ),
-                  hintText: 'Ex: Meditação matinal',
-                  hintStyle: TextStyle(
-                    color: widget.temaEscuro ? Colors.white54 : Colors.black45,
-                  ),
-                  prefixIcon: Icon(
-                    Icons.label,
-                    color: widget.temaEscuro ? Colors.white54 : Colors.black45,
-                  ),
-                ),
-              ),
-
-              SizedBox(height: 20),
-
-              Center(
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    _buildPicker(
-                      value: horasSelecionadas,
-                      max: 23,
-                      onChanged: (val) =>
-                          setState(() => horasSelecionadas = val),
-                      label: "h",
-                    ),
-                    SizedBox(width: 12),
-                    _buildPicker(
-                      value: minutosSelecionados,
-                      max: 59,
-                      onChanged: (val) =>
-                          setState(() => minutosSelecionados = val),
-                      label: "m",
-                    ),
-                    SizedBox(width: 12),
-                    _buildPicker(
-                      value: segundosSelecionados,
-                      max: 59,
-                      onChanged: (val) =>
-                          setState(() => segundosSelecionados = val),
-                      label: "s",
                     ),
                   ],
                 ),
               ),
 
-              SizedBox(height: 20),
+              SizedBox(height: altura * 0.02),
 
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              // Imagem principal
+              Stack(
+                alignment: Alignment.center,
                 children: [
-                  ElevatedButton.icon(
-                    icon: Icon(Icons.alarm),
-                    label: Text('Iniciar'),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.green[600],
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 12,
-                      ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                    onPressed: _timerAtivo
-                        ? null
-                        : () {
-                            final duracao = Duration(
-                              hours: horasSelecionadas,
-                              minutes: minutosSelecionados,
-                              seconds: segundosSelecionados,
-                            );
-                            final nome = _nomeController.text;
-                            if (duracao.inSeconds > 0 &&
-                                nome.trim().isNotEmpty) {
-                              _iniciarTimer(duracao);
-                              _salvarAlarme(nome, duracao);
-                              FocusScope.of(context).unfocus();
-                            } else {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text(
-                                    'Informe nome e duração válidos!',
-                                  ),
-                                ),
-                              );
-                            }
-                          },
-                  ),
-                  ElevatedButton.icon(
-                    icon: Icon(Icons.pause),
-                    label: Text('Parar'),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.orange[600],
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 12,
-                      ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                    onPressed: _timerAtivo ? _pararTimer : null,
-                  ),
-                  ElevatedButton.icon(
-                    icon: Icon(Icons.clear),
-                    label: Text('Apagar'),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.red[600],
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 12,
-                      ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                    onPressed: _tempoRestante > Duration.zero
-                        ? _apagarTimer
-                        : null,
-                  ),
-                ],
-              ),
-
-              SizedBox(height: 25),
-
-              Center(
-                child: Text(
-                  _tempoRestante > Duration.zero
-                      ? 'Tempo restante: ${_formatarDuration(_tempoRestante)}'
-                      : 'Nenhum timer ativo',
-                  style: TextStyle(
-                    fontSize: largura * 0.07,
-                    fontWeight: FontWeight.bold,
-                    color: widget.temaEscuro ? Colors.white : Colors.blue[800],
-                  ),
-                ),
-              ),
-
-              SizedBox(height: 30),
-
-              Text(
-                "Alarmes Salvos",
-                style: TextStyle(
-                  fontSize: largura * 0.05,
-                  fontWeight: FontWeight.bold,
-                  color: widget.temaEscuro ? Colors.white : Colors.black,
-                ),
-              ),
-              SizedBox(height: 12),
-
-              alarmesSalvos.isEmpty
-                  ? Text(
-                      "Nenhum alarme salvo.",
-                      style: TextStyle(
-                        color: widget.temaEscuro
-                            ? Colors.white54
-                            : Colors.black54,
-                      ),
-                    )
-                  : ListView.builder(
-                      shrinkWrap: true,
-                      physics: NeverScrollableScrollPhysics(),
-                      itemCount: alarmesSalvos.length,
-                      itemBuilder: (context, index) {
-                        final alarme = alarmesSalvos[index];
-                        return Card(
-                          color: widget.temaEscuro
-                              ? Colors.grey[850]
-                              : Colors.white,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(14),
-                          ),
-                          margin: EdgeInsets.symmetric(vertical: 6),
-                          elevation: 4,
-                          child: ListTile(
-                            contentPadding: EdgeInsets.symmetric(
-                              horizontal: 16,
-                              vertical: 8,
-                            ),
-                            title: Text(
-                              alarme.nome,
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: largura * 0.045,
-                                color: widget.temaEscuro
-                                    ? Colors.white
-                                    : Colors.black,
-                              ),
-                            ),
-                            subtitle: Text(
-                              _formatarDuration(alarme.duracao),
-                              style: TextStyle(
-                                color: widget.temaEscuro
-                                    ? Colors.white70
-                                    : Colors.black54,
-                              ),
-                            ),
-                            trailing: IconButton(
-                              icon: Icon(Icons.delete, color: Colors.redAccent),
-                              onPressed: () {
-                                setState(() {
-                                  alarmesSalvos.removeAt(index);
-                                });
-                              },
-                              tooltip: 'Apagar alarme',
-                            ),
-                            onTap: () {
-                              if (!_timerAtivo) {
-                                setState(() {
-                                  _nomeController.text = alarme.nome;
-                                  horasSelecionadas = alarme.duracao.inHours;
-                                  minutosSelecionados = alarme.duracao.inMinutes
-                                      .remainder(60);
-                                  segundosSelecionados = alarme
-                                      .duracao
-                                      .inSeconds
-                                      .remainder(60);
-                                });
-                                _iniciarTimer(alarme.duracao);
-                              }
-                            },
+                  ClipRRect(
+                    borderRadius: BorderRadius.zero,
+                    child: Image.network(
+                      'https://img.freepik.com/fotos-premium/uma-rosa-esta-florescendo-no-jardim_553012-2774.jpg',
+                      width: double.infinity,
+                      height: altura * 0.25,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) {
+                        return Container(
+                          width: double.infinity,
+                          height: altura * 0.25,
+                          color: Colors.grey[300],
+                          alignment: Alignment.center,
+                          child: const Text(
+                            'Erro ao carregar imagem',
+                            style: TextStyle(color: Colors.black54),
                           ),
                         );
                       },
                     ),
+                  ),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      vertical: 6,
+                      horizontal: 105,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Colors.black.withOpacity(0.4),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Text(
+                      "Entre o som e o nada.",
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: largura * 0.04,
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: 1.2,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+
+              SizedBox(height: altura * 0.04),
+
+              // Categoria: Introdução à Meditação (CustomCardMeditar)
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: largura * 0.05),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      "Introdução à Meditação",
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    SizedBox(
+                      height: cardHeight,
+                      child: ListView.separated(
+                        scrollDirection: Axis.horizontal,
+                        separatorBuilder: (context, index) =>
+                            const SizedBox(width: 12),
+                        itemCount: meditarIntroCards.length,
+                        itemBuilder: (context, index) {
+                          final item = meditarIntroCards[index];
+                          return CustomCardMeditar(
+                            text: item["text"]!,
+                            imagePath: item["image"]!,
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => item["page"]!,
+                                ),
+                              );
+                            },
+                          );
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              SizedBox(height: altura * 0.04),
+
+              // Categoria: Ruídos Terapêuticos (CustomCard)
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: largura * 0.05),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      "Ruídos terapêuticos",
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    SizedBox(
+                      height: cardHeight,
+                      child: ListView.separated(
+                        scrollDirection: Axis.horizontal,
+                        separatorBuilder: (context, index) =>
+                            const SizedBox(width: 12),
+                        itemCount: PlayList.musicasList.length,
+                        itemBuilder: (context, index) {
+                          final item = PlayList.musicasList[index];
+                          return CustomCard(
+                            text: item["text"]!,
+                            img: item["img"],
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => AudioRolando(
+                                    url: item["url"]!,
+                                    nome: item["text"]!,
+                                    categoria: "Ruídos terapêuticos",
+                                    img: item["img"],
+                                  ),
+                                ),
+                              );
+                            },
+                          );
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              SizedBox(height: altura * 0.04),
+
+              _buildAiChatCard(largura),
+
+              SizedBox(height: altura * 0.20),
             ],
           ),
         ),

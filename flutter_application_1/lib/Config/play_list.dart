@@ -28,7 +28,7 @@ class PlayList {
 
   static List<Map<String, String>> musicasList = [
     {
-      'text': 'Ruído Branco',
+      'text': 'Ruído branco',
       'url': 'https://cdn.freesound.org/previews/529/529756_4473224-lq.mp3',
       'img':
           'https://upload.wikimedia.org/wikipedia/commons/f/f2/3D_Brown_noise.gif',
@@ -40,13 +40,13 @@ class PlayList {
           'https://78.media.tumblr.com/a8a4a5b6cbeaef45b23905ecfb9bf673/tumblr_oyqshjBJs31rrqh9xo1_500.gif',
     },
     {
-      'text': 'Ruído Marrom',
+      'text': 'Ruído marrom',
       'url': 'https://cdn.freesound.org/previews/253/253922_4062622-lq.mp3',
       'img':
           'https://i.pinimg.com/originals/88/4b/0d/884b0d42ed41c6426041ebed4ecd32a2.gif',
     },
     {
-      'text': 'ambiente seguro',
+      'text': 'Ambiente seguro',
       'url': 'https://cdn.freesound.org/previews/796/796138_16936704-lq.mp3',
       'img':
           'https://www.medizin.unibe.ch/unibe/portal/fak_medizin/content/e17216/e1392980/e1396333/e1396334/movie_1_AdobeExpress_gross_ger.gif',

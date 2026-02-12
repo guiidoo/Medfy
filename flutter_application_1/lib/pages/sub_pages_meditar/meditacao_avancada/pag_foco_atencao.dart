@@ -1,12 +1,11 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart'; // necessário para bloquear orientação
 import 'package:flutter_application_1/Config/app_scroll_card.dart';
 import 'package:flutter_application_1/Config/video_play_list.dart';
-import 'package:flutter_application_1/pages/Audiopage.dart';
-import 'package:flutter_application_1/pages/home_page.dart';
+import 'package:flutter_application_1/pages/hub_page_view.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
-// Classe para cada etapa
 class EtapaMeditacao {
   final String titulo;
   final String descricao;
@@ -26,35 +25,51 @@ class _PagFocoAtencaoState extends State<PagFocoAtencao> {
     EtapaMeditacao(
       titulo: "O Poder do Agora",
       descricao:
-        "Focar é voltar ao instante que está diante de você. É sentir o ar entrar, o corpo existir, o silêncio se expandir. Toda vez que a mente se dispersa e você retorna, fortalece o músculo invisível da presença — e é nesse retorno que o foco nasce.",
+          "Focar é voltar ao instante presente, sentir o corpo e o silêncio. Cada retorno fortalece a presença e nasce o foco.",
     ),
     EtapaMeditacao(
       titulo: "A Arte de Observar",
       descricao:
-        "Durante a meditação, pensamentos surgem como nuvens. Em vez de afastá-los, apenas observe. Veja-os passar, dissolver-se, mudar de forma. O foco verdadeiro não é eliminar o movimento da mente, mas permanecer firme enquanto ele acontece.",
+          "Pensamentos surgem como nuvens; apenas observe. O foco não é eliminar a mente agitada, mas permanecer firme enquanto ela se move.",
     ),
     EtapaMeditacao(
-      titulo: "A Atenção Suave",
+      titulo: "Atenção Suave",
       descricao:
-        "O foco não precisa ser rígido. Ele pode ser leve, como um olhar calmo sobre o presente. Quando você observa com suavidade — sem cobrança, sem pressa — a mente aprende a descansar no agora, e a atenção se torna natural.",
+          "O foco pode ser leve, como um olhar calmo sobre o presente. Observar sem pressa faz a atenção se tornar natural.",
     ),
     EtapaMeditacao(
-      titulo: "O Silêncio entre os Pensamentos",
+      titulo: "Silêncio entre Pensamentos",
       descricao:
-        "Há um espaço silencioso entre um pensamento e outro. É nesse intervalo que mora a clareza. Quanto mais você reconhece esse silêncio, mais ele se expande, e o foco deixa de ser um esforço — torna-se estado.",
+          "Entre pensamentos existe um espaço silencioso. Reconhecê-lo expande a clareza e transforma o foco em estado.",
     ),
     EtapaMeditacao(
-      titulo: "A Presença Desperta",
+      titulo: "Presença Desperta",
       descricao:
-        "Com o tempo, o foco ultrapassa a meditação. Ele se manifesta em cada gesto, em cada palavra, em cada olhar. Estar atento é viver plenamente. Quando a mente se ancora no presente, tudo o que existe se ilumina — e o simples ato de estar torna-se sagrado.",
+          "Com prática, o foco se manifesta em cada gesto e olhar. Estar atento é viver plenamente, tornando o ato de estar sagrado.",
     ),
   ];
 
-  // CORES PADRÃO DO APP (sem azul)
   final Color fundoClaro = const Color(0xFFEBE8E0);
   final Color verdePrincipal = const Color(0xFF7A9591);
   final Color verdeBotao = Colors.grey[400]!;
   final Color verdeContorno = const Color(0xFFA4A4A4);
+
+  @override
+  void initState() {
+    super.initState();
+    // BLOQUEAR ORIENTAÇÃO PARA RETRATO AO ENTRAR NA TELA
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+    ]);
+  }
+
+  @override
+  void dispose() {
+    // VOLTAR PARA ORIENTAÇÕES NATIVAS AO SAIR DA TELA
+    SystemChrome.setPreferredOrientations(DeviceOrientation.values);
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -76,7 +91,7 @@ class _PagFocoAtencaoState extends State<PagFocoAtencao> {
                   Align(
                     alignment: Alignment.topLeft,
                     child: IconButton(
-                      icon: const Icon(Icons.arrow_back, color: Colors.white),
+                      icon: Icon(Icons.arrow_back, color: fundoClaro),
                       onPressed: () => Navigator.pop(context),
                     ),
                   ),
@@ -85,8 +100,8 @@ class _PagFocoAtencaoState extends State<PagFocoAtencao> {
                     "Aprofunde sua atenção e melhore sua capacidade de foco com esta prática de meditação avançada.",
                     textAlign: TextAlign.center,
                     style: TextStyle(
-                      color: Colors.white,
-                      fontSize: largura * 0.035,
+                      color: fundoClaro,
+                      fontSize: largura * 0.040,
                       fontWeight: FontWeight.w500,
                       height: 1.3,
                     ),
@@ -117,15 +132,17 @@ class _PagFocoAtencaoState extends State<PagFocoAtencao> {
                           Expanded(
                             child: GestureDetector(
                               onTap: () {
-                                Navigator.pushReplacement(
+                                Navigator.pushAndRemoveUntil(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (context) => HomePage(),
+                                    builder: (context) =>
+                                        const HubPageView(initialIndex: 0),
                                   ),
+                                  (route) => false,
                                 );
                               },
                               child: _actionButton(
-                                icon: Icons.home,
+                                icon: CupertinoIcons.house_fill,
                                 text: "Home",
                                 backgroundColor: verdeBotao,
                                 borderColor: verdeContorno,
@@ -137,16 +154,18 @@ class _PagFocoAtencaoState extends State<PagFocoAtencao> {
                           Expanded(
                             child: GestureDetector(
                               onTap: () {
-                                Navigator.push(
+                                Navigator.pushAndRemoveUntil(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (context) => const AudioPage(),
+                                    builder: (context) =>
+                                        const HubPageView(initialIndex: 2),
                                   ),
+                                  (route) => false,
                                 );
                               },
                               child: _actionButton(
                                 icon: CupertinoIcons.music_note_2,
-                                text: "Sons para Meditar",
+                                text: "Relaxe",
                                 backgroundColor: verdeBotao,
                                 borderColor: verdeContorno,
                                 iconTextColor: Colors.black,
@@ -249,7 +268,6 @@ class _PagFocoAtencaoState extends State<PagFocoAtencao> {
     );
   }
 
-  // BOTÃO PERSONALIZADO
   Widget _actionButton({
     required IconData icon,
     required String text,
@@ -268,7 +286,7 @@ class _PagFocoAtencaoState extends State<PagFocoAtencao> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Icon(icon, color: iconTextColor, size: 26),
-          const SizedBox(width: 8), // 👈 espaço entre ícone e texto
+          const SizedBox(width: 15),
           Text(
             text,
             style: TextStyle(
@@ -284,7 +302,7 @@ class _PagFocoAtencaoState extends State<PagFocoAtencao> {
 }
 
 // --- CARD DE VÍDEO ---
-class YoutubeVideoCard extends StatelessWidget {
+class YoutubeVideoCard extends StatefulWidget {
   final String videoUrl;
   final String title;
   final String subtitle;
@@ -297,9 +315,36 @@ class YoutubeVideoCard extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
-    final videoId = YoutubePlayer.convertUrlToId(videoUrl);
+  State<YoutubeVideoCard> createState() => _YoutubeVideoCardState();
+}
 
+class _YoutubeVideoCardState extends State<YoutubeVideoCard> {
+  late YoutubePlayerController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+
+    final videoId = YoutubePlayer.convertUrlToId(widget.videoUrl);
+
+    _controller = YoutubePlayerController(
+      initialVideoId: videoId ?? "",
+      flags: const YoutubePlayerFlags(
+        autoPlay: false,
+        enableCaption: true,
+        isLive: false,
+      ),
+    );
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 6),
       child: Card(
@@ -310,15 +355,27 @@ class YoutubeVideoCard extends StatelessWidget {
           child: Column(
             children: [
               YoutubePlayer(
-                controller: YoutubePlayerController(
-                  initialVideoId: videoId ?? "",
-                  flags: const YoutubePlayerFlags(autoPlay: false),
-                ),
+                controller: _controller,
                 showVideoProgressIndicator: true,
+                onReady: () {
+                  _controller.addListener(() {
+                    if (_controller.value.isFullScreen) {
+                      SystemChrome.setPreferredOrientations([
+                        DeviceOrientation.landscapeLeft,
+                        DeviceOrientation.landscapeRight,
+                      ]);
+                    } else {
+                      SystemChrome.setPreferredOrientations([
+                        DeviceOrientation.portraitUp,
+                        DeviceOrientation.portraitDown,
+                      ]);
+                    }
+                  });
+                },
               ),
               const SizedBox(height: 8),
               Text(
-                title,
+                widget.title,
                 style: const TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 17,
@@ -326,7 +383,7 @@ class YoutubeVideoCard extends StatelessWidget {
               ),
               const SizedBox(height: 4),
               Text(
-                subtitle,
+                widget.subtitle,
                 textAlign: TextAlign.center,
                 style: TextStyle(color: Colors.grey[700], fontSize: 14),
               ),

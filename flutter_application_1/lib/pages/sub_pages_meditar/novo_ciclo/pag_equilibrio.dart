@@ -1,12 +1,11 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart'; // ← Importante para controle de orientação
 import 'package:flutter_application_1/Config/app_scroll_card.dart';
 import 'package:flutter_application_1/Config/video_play_list.dart';
-import 'package:flutter_application_1/pages/Audiopage.dart';
-import 'package:flutter_application_1/pages/Home_Page.dart';
+import 'package:flutter_application_1/pages/hub_page_view.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
-// Classe para cada etapa
 class EtapaMeditacao {
   final String titulo;
   final String descricao;
@@ -26,27 +25,27 @@ class _PagEquilibrioState extends State<PagEquilibrio> {
     EtapaMeditacao(
       titulo: "O Centro Silencioso",
       descricao:
-        "O equilíbrio nasce quando você encontra, dentro de si, um ponto que permanece firme mesmo quando tudo ao redor muda. É o espaço silencioso entre um pensamento e outro, onde mora a clareza e o descanso.",
+          "O equilíbrio nasce quando você encontra um ponto interno que permanece firme mesmo quando tudo ao redor muda.",
     ),
     EtapaMeditacao(
       titulo: "Entre o Fazer e o Ser",
       descricao:
-        "Viver em equilíbrio é aprender a alternar entre agir e simplesmente estar. Há momentos de movimento e momentos de pausa — e ambos são necessários. Saber quando avançar e quando respirar é a arte da harmonia.",
+          "Viver em equilíbrio é alternar entre agir e simplesmente estar. Há momentos de movimento e momentos de pausa, e ambos são essenciais para a harmonia.",
     ),
     EtapaMeditacao(
       titulo: "O Corpo que Ensina",
       descricao:
-        "O corpo mostra o caminho: ele inspira e expira, contrai e relaxa, sem esforço. Quando o seguimos, percebemos que o equilíbrio não é rigidez, mas fluidez. É o vai e vem natural da vida acontecendo sem resistência.",
+          "O corpo inspira, expira, contrai e relaxa naturalmente. Segui-lo nos mostra que equilíbrio é fluidez, o vai e vem da vida acontecendo sem resistência.",
     ),
     EtapaMeditacao(
       titulo: "A Calma em Meio ao Caos",
       descricao:
-        "Mesmo quando tudo parece instável, o equilíbrio pode permanecer dentro de você. Ele não depende das circunstâncias, mas da forma como você as acolhe. É o olhar tranquilo que enxerga o caos e ainda escolhe a paz.",
+          "Mesmo quando tudo parece instável, o equilíbrio pode permanecer dentro de você. Não depende das circunstâncias.",
     ),
     EtapaMeditacao(
       titulo: "O Retorno ao Essencial",
       descricao:
-        "No fundo, equilíbrio é lembrar-se de quem você é. Não é buscar algo novo, mas retornar ao que sempre esteve aí: presença, serenidade e confiança. Quando você se reconecta com esse centro, descobre que a vida toda respira no mesmo ritmo que você.",
+          "Equilíbrio é lembrar-se de quem você é. Não é buscar algo novo, mas retornar ao que sempre esteve aí: presença, serenidade e confiança, em sintonia com a vida.",
     ),
   ];
 
@@ -54,6 +53,23 @@ class _PagEquilibrioState extends State<PagEquilibrio> {
   final Color verdePrincipal = const Color(0xFF7A9591);
   final Color verdeBotao = Colors.grey[400]!;
   final Color verdeContorno = const Color(0xFFA4A4A4);
+
+  @override
+  void initState() {
+    super.initState();
+    // 🔒 Bloqueia a tela apenas na vertical
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+    ]);
+  }
+
+  @override
+  void dispose() {
+    // 🔄 Libera novamente ao sair da tela (boa prática)
+    SystemChrome.setPreferredOrientations(DeviceOrientation.values);
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -75,7 +91,7 @@ class _PagEquilibrioState extends State<PagEquilibrio> {
                   Align(
                     alignment: Alignment.topLeft,
                     child: IconButton(
-                      icon: const Icon(Icons.arrow_back, color: Colors.white),
+                      icon: Icon(Icons.arrow_back, color: fundoClaro),
                       onPressed: () => Navigator.pop(context),
                     ),
                   ),
@@ -84,8 +100,8 @@ class _PagEquilibrioState extends State<PagEquilibrio> {
                     "Encontre a harmonia entre corpo, mente e espírito através da meditação do equilíbrio.",
                     textAlign: TextAlign.center,
                     style: TextStyle(
-                      color: Colors.white,
-                      fontSize: largura * 0.035,
+                      color: fundoClaro,
+                      fontSize: largura * 0.040,
                       fontWeight: FontWeight.w500,
                       height: 1.3,
                     ),
@@ -110,7 +126,7 @@ class _PagEquilibrioState extends State<PagEquilibrio> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // BOTÕES DE AÇÃO
+                      // BOTÕES
                       Row(
                         children: [
                           Expanded(
@@ -119,7 +135,8 @@ class _PagEquilibrioState extends State<PagEquilibrio> {
                                 Navigator.pushAndRemoveUntil(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (context) => HomePage(),
+                                    builder: (context) =>
+                                        const HubPageView(initialIndex: 0),
                                   ),
                                   (route) => false,
                                 );
@@ -137,16 +154,18 @@ class _PagEquilibrioState extends State<PagEquilibrio> {
                           Expanded(
                             child: GestureDetector(
                               onTap: () {
-                                Navigator.push(
+                                Navigator.pushAndRemoveUntil(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (context) => const AudioPage(),
+                                    builder: (context) =>
+                                        const HubPageView(initialIndex: 2),
                                   ),
+                                  (route) => false,
                                 );
                               },
                               child: _actionButton(
                                 icon: CupertinoIcons.music_note_2,
-                                text: "Sons para Meditar",
+                                text: "relaxar",
                                 backgroundColor: verdeBotao,
                                 borderColor: verdeContorno,
                                 iconTextColor: Colors.black,
@@ -157,7 +176,6 @@ class _PagEquilibrioState extends State<PagEquilibrio> {
                       ),
                       const SizedBox(height: 30),
 
-                      // PASSOS PARA ALCANÇAR O EQUILÍBRIO
                       Text(
                         "Passos para alcançar o equilíbrio interior",
                         style: TextStyle(
@@ -179,7 +197,7 @@ class _PagEquilibrioState extends State<PagEquilibrio> {
                             decoration: BoxDecoration(
                               color: Colors.white,
                               borderRadius: BorderRadius.circular(20),
-                              boxShadow: [
+                              boxShadow: const [
                                 BoxShadow(
                                   color: Colors.black12,
                                   blurRadius: 6,
@@ -215,7 +233,7 @@ class _PagEquilibrioState extends State<PagEquilibrio> {
 
                       const SizedBox(height: 30),
 
-                      // VÍDEOS
+                      // 🎥 VÍDEOS
                       ...VideoPlayList.videoListEquilibrio.map((video) {
                         return YoutubeVideoCard(
                           videoUrl: video["videoUrl"]!,
@@ -282,7 +300,8 @@ class _PagEquilibrioState extends State<PagEquilibrio> {
   }
 }
 
-class YoutubeVideoCard extends StatelessWidget {
+// --- CARD DE VÍDEO ---
+class YoutubeVideoCard extends StatefulWidget {
   final String videoUrl;
   final String title;
   final String subtitle;
@@ -295,9 +314,48 @@ class YoutubeVideoCard extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
-    final videoId = YoutubePlayer.convertUrlToId(videoUrl);
+  State<YoutubeVideoCard> createState() => _YoutubeVideoCardState();
+}
 
+class _YoutubeVideoCardState extends State<YoutubeVideoCard> {
+  late YoutubePlayerController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    final videoId = YoutubePlayer.convertUrlToId(widget.videoUrl);
+    _controller =
+        YoutubePlayerController(
+          initialVideoId: videoId ?? "",
+          flags: const YoutubePlayerFlags(autoPlay: false, enableCaption: true),
+        )..addListener(() async {
+          // 🔄 Detecta entrada e saída do modo tela cheia
+          if (_controller.value.isFullScreen) {
+            // 👉 Libera rotação horizontal ao entrar em tela cheia
+            await SystemChrome.setPreferredOrientations([
+              DeviceOrientation.landscapeLeft,
+              DeviceOrientation.landscapeRight,
+            ]);
+          } else {
+            // 🔒 Volta a travar na vertical ao sair
+            await SystemChrome.setPreferredOrientations([
+              DeviceOrientation.portraitUp,
+              DeviceOrientation.portraitDown,
+            ]);
+          }
+        });
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    // 🔒 Garante que volte à orientação normal
+    SystemChrome.setPreferredOrientations(DeviceOrientation.values);
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 6),
       child: Card(
@@ -308,15 +366,12 @@ class YoutubeVideoCard extends StatelessWidget {
           child: Column(
             children: [
               YoutubePlayer(
-                controller: YoutubePlayerController(
-                  initialVideoId: videoId ?? "",
-                  flags: const YoutubePlayerFlags(autoPlay: false),
-                ),
+                controller: _controller,
                 showVideoProgressIndicator: true,
               ),
               const SizedBox(height: 8),
               Text(
-                title,
+                widget.title,
                 style: const TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 17,
@@ -324,7 +379,7 @@ class YoutubeVideoCard extends StatelessWidget {
               ),
               const SizedBox(height: 4),
               Text(
-                subtitle,
+                widget.subtitle,
                 textAlign: TextAlign.center,
                 style: TextStyle(color: Colors.grey[700], fontSize: 14),
               ),

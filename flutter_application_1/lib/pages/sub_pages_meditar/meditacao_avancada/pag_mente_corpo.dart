@@ -1,12 +1,11 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_application_1/Config/app_scroll_card.dart';
 import 'package:flutter_application_1/Config/video_play_list.dart';
-import 'package:flutter_application_1/pages/Audiopage.dart';
+import 'package:flutter_application_1/pages/hub_page_view.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
-import 'package:flutter_application_1/pages/home_page.dart';
 
-// Classe para cada etapa
 class EtapaMenteCorpo {
   final String titulo;
   final String descricao;
@@ -26,35 +25,51 @@ class _PagMenteCorpoState extends State<PagMenteCorpo> {
     EtapaMenteCorpo(
       titulo: "O Corpo como Porta de Entrada",
       descricao:
-        "Tudo começa no corpo. Ele é o primeiro mestre, o primeiro espelho da mente. Cada respiração, cada batida do coração, cada tensão guardada revela algo sobre o que se passa dentro. Quando o corpo é ouvido com atenção, a mente começa a se aquietar.",
+          "Tudo começa no corpo, o primeiro mestre e espelho da mente. Ele revela o que a mente muitas vezes ignora.",
     ),
     EtapaMenteCorpo(
       titulo: "A Energia que Flui",
       descricao:
-        "Na respiração consciente, a energia se move livremente. O ar não é apenas ar — é vida, é presença. Ao inspirar, o corpo se renova; ao expirar, ele se purifica. A harmonia entre mente e corpo nasce dessa dança invisível entre movimento e quietude.",
+          "Na respiração consciente, a energia circula livremente. Cada inspiração é vida, cada expiração, liberação.",
     ),
     EtapaMenteCorpo(
       titulo: "O Olhar Interno",
       descricao:
-        "Quando você observa o corpo com serenidade, sem julgamento, a mente aprende a ver com clareza. Surge uma nova percepção: o corpo não é um obstáculo, mas um canal. Cada sensação é uma mensagem, cada desconforto, um convite à escuta.",
+          "Observar o corpo com serenidade e sem julgamentos ensina a mente a enxergar com clareza e presença.",
     ),
     EtapaMenteCorpo(
       titulo: "A Unidade Silenciosa",
       descricao:
-        "No estado avançado de meditação, não há separação entre o que sente e o que pensa. O corpo respira, a mente observa, e ambos se tornam um só fluxo de consciência. É como se a vida inteira se movesse dentro de você, em perfeita harmonia.",
+          "Na meditação profunda, não há separação entre sentir e pensar; mente e corpo se harmonizam em silêncio.",
     ),
     EtapaMenteCorpo(
       titulo: "O Templo Interior",
       descricao:
-        "Quando mente e corpo se unem, nasce o verdadeiro equilíbrio. O corpo se torna o templo da presença, e a mente, o altar do silêncio. Nesse espaço sagrado, não há esforço nem busca — apenas o simples e profundo ato de existir plenamente desperto.",
+          "Quando mente e corpo se alinham, nasce o equilíbrio. O corpo se torna o templo vivo da presença e consciência.",
     ),
   ];
 
-  // Cores padrão
   final Color fundoClaro = const Color(0xFFEBE8E0);
   final Color verdePrincipal = const Color(0xFF7A9591);
   final Color verdeBotao = Colors.grey[400]!;
   final Color verdeContorno = const Color(0xFFA4A4A4);
+
+  @override
+  void initState() {
+    super.initState();
+    // Bloquear orientação para retrato ao entrar na tela
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+    ]);
+  }
+
+  @override
+  void dispose() {
+    // Retornar orientação nativa ao sair da tela
+    SystemChrome.setPreferredOrientations(DeviceOrientation.values);
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -86,7 +101,7 @@ class _PagMenteCorpoState extends State<PagMenteCorpo> {
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       color: Colors.white,
-                      fontSize: largura * 0.035,
+                      fontSize: largura * 0.040,
                       fontWeight: FontWeight.w500,
                       height: 1.3,
                     ),
@@ -120,7 +135,8 @@ class _PagMenteCorpoState extends State<PagMenteCorpo> {
                                 Navigator.pushAndRemoveUntil(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (context) => HomePage(),
+                                    builder: (context) =>
+                                        const HubPageView(initialIndex: 0),
                                   ),
                                   (route) => false,
                                 );
@@ -138,16 +154,18 @@ class _PagMenteCorpoState extends State<PagMenteCorpo> {
                           Expanded(
                             child: GestureDetector(
                               onTap: () {
-                                Navigator.push(
+                                Navigator.pushAndRemoveUntil(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (context) => const AudioPage(),
+                                    builder: (context) =>
+                                        const HubPageView(initialIndex: 2),
                                   ),
+                                  (route) => false,
                                 );
                               },
                               child: _actionButton(
                                 icon: CupertinoIcons.music_note_2,
-                                text: "Sons Relaxantes",
+                                text: "Relaxe",
                                 backgroundColor: verdeBotao,
                                 borderColor: verdeContorno,
                                 iconTextColor: Colors.black,
@@ -217,6 +235,7 @@ class _PagMenteCorpoState extends State<PagMenteCorpo> {
 
                       const SizedBox(height: 30),
 
+                      // VÍDEOS
                       ...VideoPlayList.videoListMenteCorpo.map((video) {
                         return YoutubeVideoCard(
                           videoUrl: video["videoUrl"]!,
@@ -284,7 +303,7 @@ class _PagMenteCorpoState extends State<PagMenteCorpo> {
 }
 
 // --- CARD DE VÍDEO ---
-class YoutubeVideoCard extends StatelessWidget {
+class YoutubeVideoCard extends StatefulWidget {
   final String videoUrl;
   final String title;
   final String subtitle;
@@ -297,9 +316,36 @@ class YoutubeVideoCard extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
-    final videoId = YoutubePlayer.convertUrlToId(videoUrl);
+  State<YoutubeVideoCard> createState() => _YoutubeVideoCardState();
+}
 
+class _YoutubeVideoCardState extends State<YoutubeVideoCard> {
+  late YoutubePlayerController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+
+    final videoId = YoutubePlayer.convertUrlToId(widget.videoUrl);
+
+    _controller = YoutubePlayerController(
+      initialVideoId: videoId ?? "",
+      flags: const YoutubePlayerFlags(
+        autoPlay: false,
+        enableCaption: true,
+        isLive: false,
+      ),
+    );
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose(); // ✅ Corrigido
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 6),
       child: Card(
@@ -310,15 +356,27 @@ class YoutubeVideoCard extends StatelessWidget {
           child: Column(
             children: [
               YoutubePlayer(
-                controller: YoutubePlayerController(
-                  initialVideoId: videoId ?? "",
-                  flags: const YoutubePlayerFlags(autoPlay: false),
-                ),
+                controller: _controller,
                 showVideoProgressIndicator: true,
+                onReady: () {
+                  _controller.addListener(() {
+                    if (_controller.value.isFullScreen) {
+                      SystemChrome.setPreferredOrientations([
+                        DeviceOrientation.landscapeLeft,
+                        DeviceOrientation.landscapeRight,
+                      ]);
+                    } else {
+                      SystemChrome.setPreferredOrientations([
+                        DeviceOrientation.portraitUp,
+                        DeviceOrientation.portraitDown,
+                      ]);
+                    }
+                  });
+                },
               ),
               const SizedBox(height: 8),
               Text(
-                title,
+                widget.title,
                 style: const TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 17,
@@ -326,7 +384,7 @@ class YoutubeVideoCard extends StatelessWidget {
               ),
               const SizedBox(height: 4),
               Text(
-                subtitle,
+                widget.subtitle,
                 textAlign: TextAlign.center,
                 style: TextStyle(color: Colors.grey[700], fontSize: 14),
               ),

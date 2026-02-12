@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter_application_1/Config/play_list.dart';
 import 'audio_rolando.dart';
@@ -18,13 +19,24 @@ class _AudioPageState extends State<AudioPage> {
   final AudioPlayer _audioPlayer = AudioPlayer();
   String? audioTocando;
 
-  bool carregandoNatureza = false;
-  bool carregandoMusicas = false;
-  bool carregandoMeditation = false;
+  @override
+  void initState() {
+    super.initState();
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+    ]);
+  }
 
   @override
   void dispose() {
     _audioPlayer.dispose();
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+      DeviceOrientation.landscapeLeft,
+      DeviceOrientation.landscapeRight,
+    ]);
     super.dispose();
   }
 
@@ -36,42 +48,42 @@ class _AudioPageState extends State<AudioPage> {
     return Scaffold(
       backgroundColor: const Color(0xFFEBE8E0),
       body: SafeArea(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildCabecalho(largura),
-            SizedBox(height: altura * 0.01),
-            Expanded(
-              child: SingleChildScrollView(
-                child: Padding(
-                  padding: EdgeInsets.symmetric(horizontal: largura * 0.04),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _buildCategoria("Natureza", PlayList.naturezaList),
-                      SizedBox(height: altura * 0.03),
-                      _buildCategoria(
-                        "Ruidos terapêuticos",
-                        PlayList.musicasList,
-                      ),
-                      SizedBox(height: altura * 0.03),
-                      _buildCategoria("Meditação", PlayList.meditationList),
-                    ],
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: EdgeInsets.symmetric(horizontal: largura * 0.04),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildCabecalho(largura),
+                SizedBox(height: altura * 0.01),
+                _buildCategoria("Natureza", PlayList.naturezaList, altura),
+                SizedBox(height: altura * 0.03),
+                _buildCategoria(
+                  "Ruidos terapêuticos",
+                  PlayList.musicasList,
+                  altura,
+                ),
+                SizedBox(height: altura * 0.03),
+                Container(
+                  margin: EdgeInsets.only(bottom: 200),
+                  child: _buildCategoria(
+                    "Meditação",
+                    PlayList.meditationList,
+                    altura,
                   ),
                 ),
-              ),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );
   }
 
-  /// Cabeçalho
   Widget _buildCabecalho(double largura) {
     return Padding(
       padding: EdgeInsets.symmetric(
-        horizontal: largura * 0.06,
+        horizontal: largura * 0.02,
         vertical: largura * 0.05,
       ),
       child: Row(
@@ -114,8 +126,12 @@ class _AudioPageState extends State<AudioPage> {
     );
   }
 
-  /// Categoria com os cards
-  Widget _buildCategoria(String titulo, List<Map<String, String>> lista) {
+  // Agora recebe 'altura' para usar no SizedBox adicionado ao final de cada card
+  Widget _buildCategoria(
+    String titulo,
+    List<Map<String, String>> lista,
+    double altura,
+  ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -124,6 +140,7 @@ class _AudioPageState extends State<AudioPage> {
           style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
         ),
         const SizedBox(height: 10),
+        // Ajustei a altura para comportar também o SizedBox(height: altura * 0.20) de cada item
         SizedBox(
           height: 150,
           child: ListView.separated(
@@ -132,23 +149,28 @@ class _AudioPageState extends State<AudioPage> {
             separatorBuilder: (context, index) => const SizedBox(width: 12),
             itemBuilder: (context, index) {
               final item = lista[index];
-              return CustomCard(
-                text: item["text"]!,
-                img: item["img"], // adicionando imagem
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => AudioRolando(
-                        url: item["url"]!,
-                        nome: item["text"]!,
-                        categoria: titulo,
-                        img:
-                            item["img"], // passando imagem para a página do áudio
-                      ),
-                    ),
-                  );
-                },
+              return Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  CustomCard(
+                    text: item["text"]!,
+                    img: item["img"],
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => AudioRolando(
+                            url: item["url"]!,
+                            nome: item["text"]!,
+                            categoria: titulo,
+                            img: item["img"],
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                  // adicionado no final de cada card, como você pediu
+                ],
               );
             },
           ),

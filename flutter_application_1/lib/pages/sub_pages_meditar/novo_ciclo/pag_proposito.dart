@@ -1,12 +1,11 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_application_1/Config/app_scroll_card.dart';
 import 'package:flutter_application_1/Config/video_play_list.dart';
-import 'package:flutter_application_1/pages/Audiopage.dart';
-import 'package:flutter_application_1/pages/Home_Page.dart';
+import 'package:flutter_application_1/pages/hub_page_view.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
-// Classe para cada etapa
 class EtapaMeditacao {
   final String titulo;
   final String descricao;
@@ -26,27 +25,27 @@ class _PagPropositoState extends State<PagProposito> {
     EtapaMeditacao(
       titulo: "O Chamado Interior",
       descricao:
-        "O propósito não é algo que se busca no mundo, mas algo que desperta em silêncio dentro de você. Ele surge quando a mente se aquieta e o coração sussurra: “é por aqui”. Basta ouvir com atenção o que já estava tentando ser dito há muito tempo.",
+          "O propósito não se busca fora, mas desperta em silêncio dentro de você. Ele surge quando a mente se aquieta e o coração sussurra: 'é por aqui'. Basta ouvir.",
     ),
     EtapaMeditacao(
       titulo: "A Voz da Essência",
       descricao:
-          "Meditar é aprender a ouvir essa voz interior — aquela que fala sem palavras, que guia sem pressa. Quando você se conecta com o que realmente sente, o propósito deixa de ser uma meta e se torna um modo de viver, simples e verdadeiro.",
+          "Meditar é ouvir essa voz interior que fala sem palavras. Quando você se conecta com o que sente, o propósito deixa de ser meta e se torna modo de viver.",
     ),
     EtapaMeditacao(
       titulo: "O Caminho com Sentido",
       descricao:
-        "Propósito não é sobre grandes conquistas, mas sobre presença. É colocar intenção em cada gesto, amor em cada passo. Quando suas ações refletem o que há de mais autêntico em você, até o cotidiano se transforma em algo sagrado.",
+          "Propósito é presença, não conquistas. Coloque intenção em cada gesto e amor em cada passo. Assim, o cotidiano se torna sagrado.",
     ),
     EtapaMeditacao(
       titulo: "O Silêncio que Ilumina",
       descricao:
-        "Há um momento na prática em que tudo parece se alinhar — a mente serena, o corpo leve, o coração tranquilo. Nesse espaço, você não precisa procurar respostas. O simples fato de estar desperto já revela o caminho.",
+          "Na prática, tudo se alinha: mente serena, corpo leve, coração tranquilo. Nesse espaço, estar desperto já revela o caminho.",
     ),
     EtapaMeditacao(
       titulo: "Viver com Verdade",
       descricao:
-        "Descobrir o propósito é reconhecer que o sentido da vida está em viver com verdade. Não é o destino que importa, mas a clareza de cada passo. Quando você caminha com consciência, a vida toda se torna meditação — e o propósito, apenas o reflexo da sua presença.",
+          "Descobrir o propósito é viver com verdade. Não é o destino, mas a clareza de cada passo que transforma a vida em meditação e o propósito em reflexo da presença.",
     ),
   ];
 
@@ -54,6 +53,21 @@ class _PagPropositoState extends State<PagProposito> {
   final Color verdePrincipal = const Color(0xFF7A9591);
   final Color verdeBotao = Colors.grey[400]!;
   final Color verdeContorno = const Color(0xFFA4A4A4);
+
+  @override
+  void initState() {
+    super.initState();
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+    ]);
+  }
+
+  @override
+  void dispose() {
+    SystemChrome.setPreferredOrientations(DeviceOrientation.values);
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -75,7 +89,7 @@ class _PagPropositoState extends State<PagProposito> {
                   Align(
                     alignment: Alignment.topLeft,
                     child: IconButton(
-                      icon: const Icon(Icons.arrow_back, color: Colors.white),
+                      icon: Icon(Icons.arrow_back, color: fundoClaro),
                       onPressed: () => Navigator.pop(context),
                     ),
                   ),
@@ -84,8 +98,8 @@ class _PagPropositoState extends State<PagProposito> {
                     "Descubra seu propósito e alinhe-se com o novo ciclo de sua vida através desta meditação.",
                     textAlign: TextAlign.center,
                     style: TextStyle(
-                      color: Colors.white,
-                      fontSize: largura * 0.035,
+                      color: fundoClaro,
+                      fontSize: largura * 0.040,
                       fontWeight: FontWeight.w500,
                       height: 1.3,
                     ),
@@ -119,7 +133,8 @@ class _PagPropositoState extends State<PagProposito> {
                                 Navigator.pushAndRemoveUntil(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (context) => HomePage(),
+                                    builder: (context) =>
+                                        const HubPageView(initialIndex: 0),
                                   ),
                                   (route) => false,
                                 );
@@ -137,16 +152,18 @@ class _PagPropositoState extends State<PagProposito> {
                           Expanded(
                             child: GestureDetector(
                               onTap: () {
-                                Navigator.push(
+                                Navigator.pushAndRemoveUntil(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (context) => const AudioPage(),
+                                    builder: (context) =>
+                                        const HubPageView(initialIndex: 2),
                                   ),
+                                  (route) => false,
                                 );
                               },
                               child: _actionButton(
                                 icon: CupertinoIcons.music_note_2,
-                                text: "Sons para Meditar",
+                                text: "relaxar",
                                 backgroundColor: verdeBotao,
                                 borderColor: verdeContorno,
                                 iconTextColor: Colors.black,
@@ -157,7 +174,6 @@ class _PagPropositoState extends State<PagProposito> {
                       ),
                       const SizedBox(height: 30),
 
-                      // PASSOS PARA SE ALINHAR COM O PROPÓSITO
                       Text(
                         "Passos para se alinhar com seu propósito",
                         style: TextStyle(
@@ -179,7 +195,7 @@ class _PagPropositoState extends State<PagProposito> {
                             decoration: BoxDecoration(
                               color: Colors.white,
                               borderRadius: BorderRadius.circular(20),
-                              boxShadow: [
+                              boxShadow: const [
                                 BoxShadow(
                                   color: Colors.black12,
                                   blurRadius: 6,
@@ -215,7 +231,7 @@ class _PagPropositoState extends State<PagProposito> {
 
                       const SizedBox(height: 30),
 
-                      // VÍDEOS
+                      // --- LISTA DE VÍDEOS ---
                       ...VideoPlayList.videoListProposito.map((video) {
                         return YoutubeVideoCard(
                           videoUrl: video["videoUrl"]!,
@@ -282,7 +298,8 @@ class _PagPropositoState extends State<PagProposito> {
   }
 }
 
-class YoutubeVideoCard extends StatelessWidget {
+// --- CARD DE VÍDEO COM CONTROLE DE ROTAÇÃO ---
+class YoutubeVideoCard extends StatefulWidget {
   final String videoUrl;
   final String title;
   final String subtitle;
@@ -295,9 +312,44 @@ class YoutubeVideoCard extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
-    final videoId = YoutubePlayer.convertUrlToId(videoUrl);
+  State<YoutubeVideoCard> createState() => _YoutubeVideoCardState();
+}
 
+class _YoutubeVideoCardState extends State<YoutubeVideoCard> {
+  late YoutubePlayerController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+
+    final videoId = YoutubePlayer.convertUrlToId(widget.videoUrl) ?? "";
+
+    _controller =
+        YoutubePlayerController(
+          initialVideoId: videoId,
+          flags: const YoutubePlayerFlags(autoPlay: false),
+        )..addListener(() {
+          if (_controller.value.isFullScreen) {
+            // 🔄 Libera rotação quando o vídeo entra em tela cheia
+            SystemChrome.setPreferredOrientations(DeviceOrientation.values);
+          } else {
+            // 🔒 Volta a travar na vertical ao sair do fullscreen
+            SystemChrome.setPreferredOrientations([
+              DeviceOrientation.portraitUp,
+              DeviceOrientation.portraitDown,
+            ]);
+          }
+        });
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 6),
       child: Card(
@@ -308,15 +360,12 @@ class YoutubeVideoCard extends StatelessWidget {
           child: Column(
             children: [
               YoutubePlayer(
-                controller: YoutubePlayerController(
-                  initialVideoId: videoId ?? "",
-                  flags: const YoutubePlayerFlags(autoPlay: false),
-                ),
+                controller: _controller,
                 showVideoProgressIndicator: true,
               ),
               const SizedBox(height: 8),
               Text(
-                title,
+                widget.title,
                 style: const TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 17,
@@ -324,7 +373,7 @@ class YoutubeVideoCard extends StatelessWidget {
               ),
               const SizedBox(height: 4),
               Text(
-                subtitle,
+                widget.subtitle,
                 textAlign: TextAlign.center,
                 style: TextStyle(color: Colors.grey[700], fontSize: 14),
               ),

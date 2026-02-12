@@ -1,12 +1,11 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_application_1/Config/app_scroll_card.dart';
 import 'package:flutter_application_1/Config/video_play_list.dart';
-import 'package:flutter_application_1/pages/Audiopage.dart';
-import 'package:flutter_application_1/pages/Home_Page.dart';
+import 'package:flutter_application_1/pages/hub_page_view.dart'; // ← Importante
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
-// Classe para cada etapa
 class EtapaMeditacao {
   final String titulo;
   final String descricao;
@@ -24,37 +23,56 @@ class PagCalmaInterior extends StatefulWidget {
 class _PagCalmaInteriorState extends State<PagCalmaInterior> {
   final List<EtapaMeditacao> instrucoes = [
     EtapaMeditacao(
-      titulo: "O Silêncio que Habita em Nós",
+      titulo: "O Silêncio Interior",
       descricao:
-          "Há dentro de cada um um lugar que o barulho do mundo não alcança. Mesmo quando tudo parece agitado, esse espaço permanece intacto, esperando para ser sentido. A meditação é a chave que abre a porta para esse silêncio.",
+          "Dentro de cada um há um espaço que o barulho do mundo não alcança; a meditação nos conecta a ele.",
     ),
     EtapaMeditacao(
-      titulo: "O Coração em Repouso",
+      titulo: "Coração em Repouso",
       descricao:
-          "Quando a mente deixa de lutar contra o que é, o coração relaxa. A calma interior não é ausência de emoções, mas a capacidade de acolhê-las sem se perder nelas. É o sossego que nasce da aceitação profunda da vida.",
+          "Aceitar acalma a mente e o coração, permitindo acolher emoções sem se perder nelas.",
     ),
     EtapaMeditacao(
-      titulo: "A Paz que Não Depende",
+      titulo: "Paz Verdadeira",
       descricao:
-          "Nada externo pode criar ou tirar sua paz verdadeira. Ela não vem do lugar onde você está, nem das pessoas ao seu redor — vem da forma como você escolhe estar presente. Quando essa verdade é sentida, o mundo pode mudar, mas você permanece sereno.",
+          "A paz não depende do externo, mas de como você se mantém presente e sereno.",
     ),
     EtapaMeditacao(
-      titulo: "O Espaço Entre os Sons",
+      titulo: "Espaço Entre os Sons",
       descricao:
-          "Na prática, observe os intervalos: entre um pensamento e outro, entre uma respiração e a próxima. Esses pequenos espaços são portais para a calma interior. Quanto mais você os reconhece, mais eles se expandem dentro de você.",
+          "Observe os intervalos entre pensamentos e respirações; eles expandem a calma interior.",
     ),
     EtapaMeditacao(
-      titulo: "O Retorno à Essência",
+      titulo: "Retorno à Essência",
       descricao:
-          "A calma interior é o seu estado natural. Ela não precisa ser criada, apenas lembrada. Quando você se permite descansar em si mesmo, tudo se alinha — corpo, mente e espírito respiram em uníssono. E nesse instante, você simplesmente é: paz em forma de presença.",
+          "A calma é natural; ao se permitir descansar em si mesmo, corpo, mente e espírito se alinham.",
     ),
   ];
 
-  // CORES DO APP
   final Color fundoClaro = const Color(0xFFEBE8E0);
   final Color verdePrincipal = const Color(0xFF7A9591);
   final Color verdeBotao = Colors.grey[400]!;
   final Color verdeContorno = const Color(0xFFA4A4A4);
+
+  @override
+  void initState() {
+    super.initState();
+    // 🔒 Bloqueia em retrato ao abrir a página
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+    ]);
+  }
+
+  @override
+  void dispose() {
+    // 🔒 Retorna para retrato quando sair da página
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+    ]);
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -76,7 +94,7 @@ class _PagCalmaInteriorState extends State<PagCalmaInterior> {
                   Align(
                     alignment: Alignment.topLeft,
                     child: IconButton(
-                      icon: const Icon(Icons.arrow_back, color: Colors.white),
+                      icon: Icon(Icons.arrow_back, color: fundoClaro),
                       onPressed: () => Navigator.pop(context),
                     ),
                   ),
@@ -85,8 +103,8 @@ class _PagCalmaInteriorState extends State<PagCalmaInterior> {
                     "Aprofunde-se em sua serenidade interior e descubra o poder do silêncio e da presença plena.",
                     textAlign: TextAlign.center,
                     style: TextStyle(
-                      color: Colors.white,
-                      fontSize: largura * 0.035,
+                      color: fundoClaro,
+                      fontSize: largura * 0.040,
                       fontWeight: FontWeight.w500,
                       height: 1.3,
                     ),
@@ -120,7 +138,8 @@ class _PagCalmaInteriorState extends State<PagCalmaInterior> {
                                 Navigator.pushAndRemoveUntil(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (context) => HomePage(),
+                                    builder: (context) =>
+                                        const HubPageView(initialIndex: 0),
                                   ),
                                   (route) => false,
                                 );
@@ -138,16 +157,18 @@ class _PagCalmaInteriorState extends State<PagCalmaInterior> {
                           Expanded(
                             child: GestureDetector(
                               onTap: () {
-                                Navigator.push(
+                                Navigator.pushAndRemoveUntil(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (context) => const AudioPage(),
+                                    builder: (context) =>
+                                        const HubPageView(initialIndex: 2),
                                   ),
+                                  (route) => false,
                                 );
                               },
                               child: _actionButton(
                                 icon: CupertinoIcons.music_note_2,
-                                text: "Sons para Meditar",
+                                text: "Relaxe",
                                 backgroundColor: verdeBotao,
                                 borderColor: verdeContorno,
                                 iconTextColor: Colors.black,
@@ -180,7 +201,7 @@ class _PagCalmaInteriorState extends State<PagCalmaInterior> {
                             decoration: BoxDecoration(
                               color: Colors.white,
                               borderRadius: BorderRadius.circular(20),
-                              boxShadow: [
+                              boxShadow: const [
                                 BoxShadow(
                                   color: Colors.black12,
                                   blurRadius: 6,
@@ -312,9 +333,31 @@ class YoutubeVideoCard extends StatelessWidget {
               YoutubePlayer(
                 controller: YoutubePlayerController(
                   initialVideoId: videoId ?? "",
-                  flags: const YoutubePlayerFlags(autoPlay: false),
+                  flags: const YoutubePlayerFlags(
+                    autoPlay: false,
+                    enableCaption: true,
+                    isLive: false,
+                  ),
                 ),
                 showVideoProgressIndicator: true,
+                onReady: () {
+                  YoutubePlayerController controller = YoutubePlayerController(
+                    initialVideoId: videoId ?? "",
+                  );
+                  controller.addListener(() {
+                    if (controller.value.isFullScreen) {
+                      SystemChrome.setPreferredOrientations([
+                        DeviceOrientation.landscapeLeft,
+                        DeviceOrientation.landscapeRight,
+                      ]);
+                    } else {
+                      SystemChrome.setPreferredOrientations([
+                        DeviceOrientation.portraitUp,
+                        DeviceOrientation.portraitDown,
+                      ]);
+                    }
+                  });
+                },
               ),
               const SizedBox(height: 8),
               Text(

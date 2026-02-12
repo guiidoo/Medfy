@@ -1,11 +1,12 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_application_1/Config/app_scroll_card.dart';
-import 'package:flutter_application_1/pages/Audiopage.dart';
 import 'package:flutter_application_1/Config/video_play_list.dart';
-import 'package:flutter_application_1/pages/Home_Page.dart';
+import 'package:flutter_application_1/pages/hub_page_view.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
+// --- CLASSE DE DADOS ---
 class EtapaRelaxamento {
   final String titulo;
   final String descricao;
@@ -13,6 +14,7 @@ class EtapaRelaxamento {
   EtapaRelaxamento({required this.titulo, required this.descricao});
 }
 
+// --- PÁGINA PRINCIPAL ---
 class PagRelaxar extends StatefulWidget {
   const PagRelaxar({super.key});
 
@@ -25,27 +27,27 @@ class _PagRelaxarState extends State<PagRelaxar> {
     EtapaRelaxamento(
       titulo: "O Espaço da Calma",
       descricao:
-          "Encontre um lugar onde o silêncio possa te abraçar. Não precisa ser perfeito — apenas um canto onde você possa respirar sem pressa. Feche os olhos e perceba o som do ambiente, o toque do ar na pele. O relaxamento começa quando você se permite estar presente.",
+          "O Espaço da Calma: Encontre um lugar tranquilo, respire devagar e preste atenção aos sons e sensações ao seu redor. Permita-se estar completamente presente.",
     ),
     EtapaRelaxamento(
       titulo: "Soltar o Corpo",
       descricao:
-          "Sinta o peso dos ombros caindo, o maxilar se abrindo, as mãos se soltando. Cada parte do corpo responde ao seu cuidado. Imagine que está derretendo suavemente em direção à terra, entregando o cansaço e acolhendo a leveza.",
+          "Soltar o Corpo: Sinta o peso dos ombros, mãos e maxilar relaxarem. Cada parte do corpo se entrega à leveza, liberando tensões acumuladas.",
     ),
     EtapaRelaxamento(
       titulo: "Deixar Ir",
       descricao:
-          "Relaxar também é uma forma de deixar ir. Solte a necessidade de controlar, de entender, de resolver tudo. O descanso é um ato de confiança: o mundo pode esperar um pouco enquanto você volta a si.",
+          "Deixar Ir: Solte a necessidade de controlar ou resolver tudo. Confie que o mundo pode esperar enquanto você retorna a si mesmo.",
     ),
     EtapaRelaxamento(
       titulo: "Silenciar o Ruído Interno",
       descricao:
-          "Quando o corpo desacelera, a mente começa a falar menos. O barulho dos pensamentos se torna mais distante. Nesse silêncio, há espaço para sentir, para ouvir o próprio coração e perceber o quanto a paz sempre esteve ali, só adormecida.",
+          "Silenciar a Mente: Com o corpo desacelerado, os pensamentos se tornam mais suaves. Ouça seu coração e perceba a paz que sempre esteve ali.",
     ),
     EtapaRelaxamento(
       titulo: "O Estado de Entrega",
       descricao:
-          "Relaxe sem esforço. Permita que o corpo e a mente se encontrem em quietude. Não há o que buscar, apenas o que sentir. Nesse instante, você não está tentando relaxar — você é o relaxamento. E nele, encontra o verdadeiro descanso.",
+          "Entrega Total: Relaxe sem esforço e permita que corpo e mente se encontrem em quietude. Nesse instante, você não apenas relaxa você se torna o relaxamento.",
     ),
   ];
 
@@ -53,6 +55,20 @@ class _PagRelaxarState extends State<PagRelaxar> {
   final Color verdePrincipal = const Color(0xFF7A9591);
   final Color verdeBotao = Colors.grey[400]!;
   final Color verdeContorno = const Color(0xFFA4A4A4);
+
+  @override
+  void initState() {
+    super.initState();
+    // Bloqueia o app na vertical quando entrar na tela
+    SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
+  }
+
+  @override
+  void dispose() {
+    // Permite rotação novamente ao sair da tela
+    SystemChrome.setPreferredOrientations(DeviceOrientation.values);
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -84,7 +100,7 @@ class _PagRelaxarState extends State<PagRelaxar> {
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       color: Colors.white,
-                      fontSize: largura * 0.035,
+                      fontSize: largura * 0.040,
                       fontWeight: FontWeight.w500,
                       height: 1.3,
                     ),
@@ -118,7 +134,8 @@ class _PagRelaxarState extends State<PagRelaxar> {
                                 Navigator.pushAndRemoveUntil(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (context) => HomePage(),
+                                    builder: (context) =>
+                                        const HubPageView(initialIndex: 0),
                                   ),
                                   (route) => false,
                                 );
@@ -136,16 +153,18 @@ class _PagRelaxarState extends State<PagRelaxar> {
                           Expanded(
                             child: GestureDetector(
                               onTap: () {
-                                Navigator.push(
+                                Navigator.pushAndRemoveUntil(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (context) => const AudioPage(),
+                                    builder: (context) =>
+                                        const HubPageView(initialIndex: 2),
                                   ),
+                                  (route) => false,
                                 );
                               },
                               child: _actionButton(
                                 icon: CupertinoIcons.music_note_2,
-                                text: "Sons relaxantes",
+                                text: "Relaxe",
                                 backgroundColor: verdeBotao,
                                 borderColor: verdeContorno,
                                 iconTextColor: Colors.black,
@@ -154,6 +173,7 @@ class _PagRelaxarState extends State<PagRelaxar> {
                           ),
                         ],
                       ),
+
                       const SizedBox(height: 30),
 
                       // PASSOS PARA RELAXAR
@@ -167,6 +187,7 @@ class _PagRelaxarState extends State<PagRelaxar> {
                       ),
                       const SizedBox(height: 20),
 
+                      // CARDS DE TEXTO
                       AppScrollCard<EtapaRelaxamento>(
                         items: instrucoes,
                         height: altura * 0.35,
@@ -178,7 +199,7 @@ class _PagRelaxarState extends State<PagRelaxar> {
                             decoration: BoxDecoration(
                               color: Colors.white,
                               borderRadius: BorderRadius.circular(20),
-                              boxShadow: [
+                              boxShadow: const [
                                 BoxShadow(
                                   color: Colors.black12,
                                   blurRadius: 6,
@@ -212,9 +233,11 @@ class _PagRelaxarState extends State<PagRelaxar> {
                         },
                       ),
 
-                      const SizedBox(height: 20),
-
-                      // VÍDEOS
+                      // --- AUMENTAR ESPAÇO ABAIXO DOS CARDS ---
+                      const SizedBox(
+                        height: 50,
+                      ), // espaço maior antes dos vídeos
+                      // LISTA DE VÍDEOS
                       ...VideoPlayList.videoListRelaxar.map((video) {
                         return YoutubeVideoCard(
                           videoUrl: video["videoUrl"]!,
@@ -282,7 +305,7 @@ class _PagRelaxarState extends State<PagRelaxar> {
 }
 
 // --- CARD DE VÍDEO ---
-class YoutubeVideoCard extends StatelessWidget {
+class YoutubeVideoCard extends StatefulWidget {
   final String videoUrl;
   final String title;
   final String subtitle;
@@ -295,9 +318,42 @@ class YoutubeVideoCard extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
-    final videoId = YoutubePlayer.convertUrlToId(videoUrl);
+  State<YoutubeVideoCard> createState() => _YoutubeVideoCardState();
+}
 
+class _YoutubeVideoCardState extends State<YoutubeVideoCard> {
+  late YoutubePlayerController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+
+    final videoId = YoutubePlayer.convertUrlToId(widget.videoUrl);
+    _controller = YoutubePlayerController(
+      initialVideoId: videoId ?? "",
+      flags: const YoutubePlayerFlags(autoPlay: false, enableCaption: true),
+    )..addListener(_listener);
+  }
+
+  void _listener() {
+    if (_controller.value.isFullScreen) {
+      // Permite rotação quando o vídeo está em tela cheia
+      SystemChrome.setPreferredOrientations(DeviceOrientation.values);
+    } else {
+      // Bloqueia novamente na vertical ao sair da tela cheia
+      SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
+    }
+  }
+
+  @override
+  void dispose() {
+    _controller.removeListener(_listener);
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 6),
       child: Card(
@@ -308,15 +364,12 @@ class YoutubeVideoCard extends StatelessWidget {
           child: Column(
             children: [
               YoutubePlayer(
-                controller: YoutubePlayerController(
-                  initialVideoId: videoId ?? "",
-                  flags: const YoutubePlayerFlags(autoPlay: false),
-                ),
+                controller: _controller,
                 showVideoProgressIndicator: true,
               ),
               const SizedBox(height: 8),
               Text(
-                title,
+                widget.title,
                 style: const TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 17,
@@ -324,7 +377,7 @@ class YoutubeVideoCard extends StatelessWidget {
               ),
               const SizedBox(height: 4),
               Text(
-                subtitle,
+                widget.subtitle,
                 textAlign: TextAlign.center,
                 style: TextStyle(color: Colors.grey[700], fontSize: 14),
               ),

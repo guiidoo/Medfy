@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_application_1/pages/sub_pages_meditar/meditacao_avancada/pag_mente_corpo.dart';
 import 'package:flutter_application_1/widgets/custom_card_meditar.dart';
 import 'package:flutter_application_1/pages/sub_pages_meditar/introducao/pag_respiracao.dart';
@@ -14,28 +15,79 @@ class PagMeditar extends StatelessWidget {
   final bool temaEscuro;
   final VoidCallback? onTrocarTema;
 
-  const PagMeditar({super.key, this.temaEscuro = false, this.onTrocarTema});
+  PagMeditar({super.key, this.temaEscuro = false, this.onTrocarTema});
 
-  final Map<String, List<Map<String, dynamic>>> sections = const {
+  final Map<String, List<Map<String, dynamic>>> sections = {
     "Introdução-Meditação": [
-      {"text": "Respiração", "page": PagRespiracao()},
-      {"text": "Relaxamento", "page": PagRelaxar()},
-      {"text": "Comece a Meditar", "page": PagAprendaMeditacao()},
+      {
+        "text": "Respiração",
+        "page": PagRespiracao(),
+        "image":
+            "https://cdn.pixabay.com/photo/2018/08/16/02/01/purple-3609478_1280.jpg",
+      },
+      {
+        "text": "Relaxamento",
+        "page": PagRelaxar(),
+        "image":
+            "https://cdn.pixabay.com/photo/2017/12/17/21/44/drink-3025022_1280.jpg",
+      },
+      {
+        "text": "Comece a Meditar",
+        "page": PagAprendaMeditacao(),
+        "image":
+            "https://cdn.pixabay.com/photo/2020/06/29/17/41/meditate-5353620_1280.jpg",
+      },
     ],
     "Meditação Novo Ciclo": [
-      {"text": "Equilíbrio", "page": PagEquilibrio()},
-      {"text": "Propósito", "page": PagProposito()},
-      {"text": "Aceitação", "page": PagAceitacao()},
+      {
+        "text": "Equilíbrio",
+        "page": PagEquilibrio(),
+        "image":
+            "https://cdn.pixabay.com/photo/2019/10/01/20/13/stone-tower-4519290_1280.jpg",
+      },
+      {
+        "text": "Propósito",
+        "page": PagProposito(),
+        "image":
+            "https://cdn.pixabay.com/photo/2020/06/09/08/01/road-5277457_1280.jpg",
+      },
+      {
+        "text": "Aceitação",
+        "page": PagAceitacao(),
+        "image":
+            "https://cdn.pixabay.com/photo/2016/11/22/23/29/meditate-1851165_1280.jpg",
+      },
     ],
     "Meditação Avançada": [
-      {"text": "Foco e Atenção", "page": PagFocoAtencao()},
-      {"text": "Calma Interior", "page": PagCalmaInterior()},
-      {"text": "Mente e Corpo", "page": PagMenteCorpo()},
+      {
+        "text": "Foco e Atenção",
+        "page": PagFocoAtencao(),
+        "image":
+            "https://cdn.pixabay.com/photo/2017/08/26/15/37/eye-2683414_1280.jpg",
+      },
+      {
+        "text": "Calma Interior",
+        "page": PagCalmaInterior(),
+        "image":
+            "https://cdn.pixabay.com/photo/2015/04/29/20/42/waterfall-746108_1280.jpg",
+      },
+      {
+        "text": "Mente e Corpo",
+        "page": PagMenteCorpo(),
+        "image":
+            "https://cdn.pixabay.com/photo/2025/02/21/11/06/woman-9421843_1280.jpg",
+      },
     ],
   };
 
   @override
   Widget build(BuildContext context) {
+    // 🔒 Bloquear orientação da tela apenas vertical
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+    ]);
+
     final largura = MediaQuery.of(context).size.width;
 
     return Scaffold(
@@ -48,6 +100,9 @@ class PagMeditar extends StatelessWidget {
             ...sections.entries.map((section) {
               return _buildSection(context, section.key, section.value);
             }).toList(),
+
+            // Espaço reservado para o menu flutuante no final
+            const SizedBox(height: 120), // ajuste conforme altura do menu
           ],
         ),
       ),
@@ -132,7 +187,7 @@ class PagMeditar extends StatelessWidget {
             children: items.map((item) {
               return CustomCardMeditar(
                 text: item["text"],
-                imagePath: "assets/images/exemplo.png",
+                imagePath: item["image"],
                 onTap: () {
                   Navigator.push(
                     context,

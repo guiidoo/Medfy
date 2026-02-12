@@ -1,9 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/Config/app_scroll_card.dart';
-import 'package:flutter_application_1/pages/Audiopage.dart';
 import 'package:flutter_application_1/Config/video_play_list.dart';
-import 'package:flutter_application_1/pages/Home_Page.dart';
+import 'package:flutter_application_1/pages/hub_page_view.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
 class EtapaRespiracao {
@@ -25,27 +24,27 @@ class _PagRespiracaoState extends State<PagRespiracao> {
     EtapaRespiracao(
       titulo: "O Primeiro Passo",
       descricao:
-          "Antes de qualquer técnica, aprenda a observar a respiração como ela é. Não tente controlá-la. Apenas sinta o ar entrando e saindo, o peito se expandindo, o corpo se movendo. Essa simples consciência já é o início da meditação — o momento em que você se conecta com o presente.",
+          "Observe a respiração como ela é. Sinta o ar entrando e saindo, o corpo se movendo. Essa consciência já é o início da meditação.",
     ),
     EtapaRespiracao(
       titulo: "Inspiração e Soltar",
       descricao:
-          "Respire fundo pelo nariz, enchendo o abdômen como se ele fosse um balão. Segure por um instante e solte lentamente pela boca. A cada expiração, imagine que está liberando tensões e pensamentos presos. O corpo se suaviza, e a mente começa a silenciar.",
+          "Respire fundo pelo nariz, segure e solte lentamente pela boca. A cada expiração, libere tensões e pensamentos presos.",
     ),
     EtapaRespiracao(
       titulo: "O Ritmo Natural",
       descricao:
-          "Encontre um ritmo que seja confortável. Nem rápido, nem lento demais. O importante é que cada ciclo de respiração te envolva completamente. Quando o ar entra, a energia chega; quando o ar sai, tudo o que é desnecessário parte. Assim nasce o equilíbrio.",
+          "Encontre um ritmo confortável. Quando o ar entra, a energia chega; quando sai, o desnecessário se vai, trazendo equilíbrio.",
     ),
     EtapaRespiracao(
       titulo: "Quando a Mente Foge",
       descricao:
-          "É natural que os pensamentos tentem distrair você. Quando isso acontecer, apenas perceba e volte gentilmente a atenção para o ar que entra e sai. Não há erro na prática, apenas retorno — e cada retorno fortalece a presença.",
+          "Se os pensamentos se dispersarem, gentilmente volte a atenção para o ar que entra e sai. Cada retorno fortalece a presença.",
     ),
     EtapaRespiracao(
       titulo: "O Silêncio Interior",
       descricao:
-          "Depois de algumas respirações conscientes, algo muda. O corpo relaxa, o tempo desacelera, e o silêncio interno surge naturalmente. Nesse instante, a respiração se torna uma ponte entre o que você sente e o que realmente é: paz em movimento.",
+          "Após algumas respirações conscientes, o corpo relaxa e surge o silêncio interno, ponte entre o que sente e a paz.",
     ),
   ];
 
@@ -57,7 +56,9 @@ class _PagRespiracaoState extends State<PagRespiracao> {
   @override
   Widget build(BuildContext context) {
     final largura = MediaQuery.of(context).size.width;
-    final altura = MediaQuery.of(context).size.height;
+    final altura = MediaQuery.of(
+      context,
+    ).size.height; // necessário para altura dos cards
 
     return Scaffold(
       backgroundColor: verdePrincipal,
@@ -84,7 +85,7 @@ class _PagRespiracaoState extends State<PagRespiracao> {
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       color: fundoClaro,
-                      fontSize: largura * 0.035,
+                      fontSize: largura * 0.040,
                       fontWeight: FontWeight.w500,
                       height: 1.3,
                     ),
@@ -118,7 +119,8 @@ class _PagRespiracaoState extends State<PagRespiracao> {
                                 Navigator.pushAndRemoveUntil(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (context) => HomePage(),
+                                    builder: (context) =>
+                                        const HubPageView(initialIndex: 0),
                                   ),
                                   (route) => false,
                                 );
@@ -136,16 +138,18 @@ class _PagRespiracaoState extends State<PagRespiracao> {
                           Expanded(
                             child: GestureDetector(
                               onTap: () {
-                                Navigator.push(
+                                Navigator.pushAndRemoveUntil(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (context) => const AudioPage(),
+                                    builder: (context) =>
+                                        const HubPageView(initialIndex: 2),
                                   ),
+                                  (route) => false,
                                 );
                               },
                               child: _actionButton(
                                 icon: CupertinoIcons.music_note_2,
-                                text: "Sons relaxantes",
+                                text: "Relaxe",
                                 backgroundColor: verdeBotao,
                                 borderColor: verdeContorno,
                                 iconTextColor: Colors.black,
@@ -156,7 +160,7 @@ class _PagRespiracaoState extends State<PagRespiracao> {
                       ),
                       const SizedBox(height: 30),
 
-                      // PASSOS PARA RESPIRAÇÃO
+                      // GUIA DE RESPIRAÇÃO
                       Text(
                         "Guia de respiração",
                         style: TextStyle(
@@ -167,14 +171,15 @@ class _PagRespiracaoState extends State<PagRespiracao> {
                       ),
                       const SizedBox(height: 20),
 
+                      // CARDS DE RESPIRAÇÃO
                       AppScrollCard<EtapaRespiracao>(
                         items: instrucoes,
-                        height: altura * 0.35,
+                        height: altura * 0.25, // altura reduzida
                         activeDotColor: verdePrincipal,
                         inactiveDotColor: Colors.grey[400]!,
                         itemBuilder: (etapa) {
                           return Container(
-                            padding: const EdgeInsets.all(16),
+                            padding: const EdgeInsets.all(12), // padding menor
                             decoration: BoxDecoration(
                               color: Colors.white,
                               borderRadius: BorderRadius.circular(20),
@@ -192,17 +197,17 @@ class _PagRespiracaoState extends State<PagRespiracao> {
                                 Text(
                                   etapa.titulo,
                                   style: TextStyle(
-                                    fontSize: 22,
+                                    fontSize: 20, // menor que antes
                                     fontWeight: FontWeight.bold,
                                     color: verdePrincipal,
                                   ),
                                 ),
-                                const SizedBox(height: 8),
+                                const SizedBox(height: 6), // diminui espaço
                                 Text(
                                   etapa.descricao,
                                   style: const TextStyle(
-                                    fontSize: 18,
-                                    height: 1.4,
+                                    fontSize: 16, // texto menor
+                                    height: 1.3, // altura da linha menor
                                     color: Colors.black87,
                                   ),
                                 ),
@@ -212,7 +217,7 @@ class _PagRespiracaoState extends State<PagRespiracao> {
                         },
                       ),
 
-                      const SizedBox(height: 20),
+                      const SizedBox(height: 30),
 
                       // VÍDEOS
                       ...VideoPlayList.videoListrespiracao.map((video) {
@@ -268,7 +273,6 @@ class _PagRespiracaoState extends State<PagRespiracao> {
   }
 }
 
-// --- CARD DE VÍDEO ---
 class YoutubeVideoCard extends StatelessWidget {
   final String videoUrl;
   final String title;
